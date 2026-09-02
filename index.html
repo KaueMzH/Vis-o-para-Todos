@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionAI - Óculos Inteligentes e Portal de Apoio</title>
+  <meta name="description" content="Portal de apoio para pessoas com deficiência visual e apresentação dos óculos inteligentes VisionAI Smart Glasses.">
+  
+  <style>
+    /* ==========================================================================
+       VARIÁVEIS DE DESIGN E TEMA
+       ========================================================================== */
+    :root {
+      /* Cores Base - Tema Escuro Padrão (Alto Contraste Integrado) */
+      --bg-primary: #121212;
+      --bg-secondary: #1E1E1E;
+      --bg-card: #282828;
+      
+      --text-primary: #FFFFFF;
+      --text-secondary: #E0E0E0;
+      --text-muted: #B0B0B0;
+      
+      --accent-color: #00E5FF;       /* Ciano vibrante */
+      --accent-hover: #80D8FF;
+      --highlight-color: #FFD600;    /* Amarelo vibrante */
+      
+      --border-color: #444444;
+      --focus-outline: #FFD600;
+      
+      /* Tipografia */
+      --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --font-size-base: 18px;       /* Mínimo de 18px para acessibilidade */
+      --line-height-base: 1.6;
+      
+      /* Espaçamento e Transições */
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 4rem;
+      --transition-speed: 0.2s;
+    }
+
+    /* Tema de Altíssimo Contraste (Ativado via JS) */
+    body.high-contrast {
+      --bg-primary: #000000;
+      --bg-secondary: #000000;
+      --bg-card: #000000;
+      --text-primary: #FFFF00;      /* Amarelo sobre preto */
+      --text-secondary: #FFFFFF;
+      --text-muted: #FFFFFF;
+      --accent-color: #00FFFF;
+      --accent-hover: #00FFFF;
+      --highlight-color: #FFFF00;
+      --border-color: #FFFFFF;
+      --focus-outline: #00FF00;
+    }
+
+    /* Modificadores de Tamanho de Fonte */
+    body.font-large {
+      --font-size-base: 22px;
+    }
+    body.font-xlarge {
+      --font-size-base: 26px;
+    }
+
+    /* ==========================================================================
+       RESET E ESTILOS GERAIS
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-base);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    /* Foco acessível universal para navegação por teclado */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 4px solid var(--focus-outline);
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+
+    /* Link de atalho para saltar direto para o conteúdo (Acessibilidade) */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 10px;
+      background: var(--highlight-color);
+      color: #000000;
+      padding: 1rem;
+      z-index: 1000;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: top 0.2s;
+    }
+
+    .skip-link:focus {
+      top: 10px;
+    }
+
+    /* ==========================================================================
+       BARRA SUPORTE & ACESSIBILIDADE FIXA
+       ========================================================================== */
+    .accessibility-bar {
+      position: sticky;
+      top: 0;
+      background-color: #000000;
+      border-bottom: 2px solid var(--accent-color);
+      padding: var(--spacing-sm) var(--spacing-md);
+      z-index: 900;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+    }
+
+    .accessibility-bar p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .acc-controls {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+
+    .btn-acc {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .btn-acc:hover {
+      background-color: var(--accent-color);
+      color: #000000;
+    }
+
+    /* ==========================================================================
+       CABEÇALHO E NAVEGAÇÃO PRINCIPAL
+       ========================================================================== */
+    .main-header {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .logo-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      padding: var(--spacing-sm);
+      border-bottom: 2px solid transparent;
+      transition: border-color var(--transition-speed);
+    }
+
+    .nav-link:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    /* ==========================================================================
+       SEÇÃO HERO (APRESENTAÇÃO)
+       ========================================================================== */
+    .hero-section {
+      padding: var(--spacing-xl) var(--spacing-lg);
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .hero-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .hero-content h1 {
+      font-size: 2.5rem;
+      color: var(--accent-color);
+      margin-bottom: var(--spacing-md);
+      line-height: 1.2;
+    }
+
+    .hero-content p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .btn-cta {
+      display: inline-block;
+      background-color: var(--highlight-color);
+      color: #000000;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0.8rem 1.6rem;
+      text-decoration: none;
+      border-radius: 6px;
+      border: 2px solid var(--highlight-color);
+      transition: transform var(--transition-speed), background-color var(--transition-speed);
+    }
+
+    .btn-cta:hover {
+      background-color: #000000;
+      color: var(--highlight-color);
+      transform: translateY(-2px);
+    }
+
+    .hero-image-container {
+      text-align: center;
+    }
+
+    .hero-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid var(--accent-color);
+      background-color: var(--bg-card);
+    }
+
+    /* ==========================================================================
+       SEÇÃO DE RECURSOS (OS 4 PILARES)
+       ========================================================================== */
+    .features-section {
+      padding: var(--spacing-xl) var(--spacing-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      text-align: center;
+      color: var(--accent-color);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    @media (min-width: 768px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .feature-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      position: relative;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background-color: var(--accent-color);
+      border-radius: 8px 0 0 8px;
+    }
+
+    .feature-title {
+      font-size: 1.4rem;
+      color: var(--highlight-color);
+    }
+
+    /* ==========================================================================
+       SEÇÃO DE APOIO E COMUNIDADE
+       ========================================================================== */
+    .community-section {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-xl) var(--spacing-lg);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .community-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .community-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-lg);
+    }
+
+    @media (min-width: 768px) {
+      .community-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .info-card {
+      background-color: var(--bg-primary);
+      padding: var(--spacing-md);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+
+    .info-card h3 {
+      color: var(--accent-color);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .info-card a {
+      color: var(--highlight-color);
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       SEÇÃO DE DEPOIMENTOS
+       ========================================================================== */
+    .testimonials-section {
+      padding: var(--spacing-xl) var(--spacing-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-lg);
+    }
+
+    @media (min-width: 768px) {
+      .testimonials-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .testimonial-card {
+      background-color: var(--bg-card);
+      padding: var(--spacing-lg);
+      border-radius: 8px;
+      border-left: 4px solid var(--highlight-color);
+    }
+
+    .testimonial-quote {
+      font-style: italic;
+      margin-bottom: var(--spacing-md);
+      color: var(--text-secondary);
+    }
+
+    .testimonial-author {
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    /* ==========================================================================
+       FORMULÁRIO DE CONTATO E PRÉ-VENDA
+       ========================================================================== */
+    .contact-section {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-xl) var(--spacing-lg);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .contact-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      font-size: var(--font-size-base);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent-color);
+    }
+
+    .form-hint {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .btn-submit {
+      background-color: var(--accent-color);
+      color: #000000;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color var(--transition-speed);
+    }
+
+    .btn-submit:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Message de Confirmação Acessível */
+    .form-status {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: 4px;
+      display: none;
+    }
+
+    .form-status.success {
+      display: block;
+      background-color: #1b5e20;
+      color: #ffffff;
+      border: 1px solid #81c784;
+    }
+
+    /* ==========================================================================
+       RODAPÉ
+       ========================================================================== */
+    .main-footer {
+      background-color: #000000;
+      color: var(--text-secondary);
+      padding: var(--spacing-lg);
+      border-top: 2px solid var(--accent-color);
+      text-align: center;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: center;
+    }
+
+    .wcag-badge {
+      display: inline-block;
+      border: 1px solid var(--highlight-color);
+      color: var(--highlight-color);
+      padding: 0.3rem 0.8rem;
+      font-weight: bold;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Link direto para ignorar o menu e ir ao conteúdo principal (Para leitores de tela e teclado) -->
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <!-- ==========================================================================
+       BARRA FIXA DE ACESSIBILIDADE
+       ========================================================================== -->
+  <div class="accessibility-bar" role="region" aria-label="Ferramentas de Acessibilidade">
+    <p><strong>Acessibilidade:</strong> Ajuste a exibição conforme sua preferência</p>
+    <div class="acc-controls">
+      <button id="btn-contrast" class="btn-acc" aria-pressed="false">
+        <span aria-hidden="true">◐</span> Alto Contraste
+      </button>
+      <button id="btn-font-increase" class="btn-acc" aria-label="Aumentar tamanho do texto">
+        A+
+      </button>
+      <button id="btn-font-reset" class="btn-acc" aria-label="Restaurar tamanho do texto original">
+        A Padrão
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CABEÇALHO E NAVEGAÇÃO
+       ========================================================================== -->
+  <header class="main-header" role="banner">
+    <div class="header-container">
+      <a href="#home" class="logo-title" aria-label="VisionAI Página Inicial">
+        <span aria-hidden="true">👓</span> VisionAI
+      </a>
+      
+      <nav role="navigation" aria-label="Menu Principal">
+        <ul class="nav-list">
+          <li><a href="#recursos" class="nav-link">Recursos do Produto</a></li>
+          <li><a href="#comunidade" class="nav-link">Apoio &amp; Comunidade</a></li>
+          <li><a href="#depoimentos" class="nav-link">Depoimentos</a></li>
+          <li><a href="#contato" class="nav-link">Pré-venda &amp; Contato</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       CONTEÚDO PRINCIPAL
+       ========================================================================== -->
+  <main id="main-content" tabIndex="-1">
+
+    <!-- HERO SECTION -->
+    <section id="home" class="hero-section" aria-labelledby="hero-title">
+      <div class="hero-container">
+        <div class="hero-content">
+          <h1 id="hero-title">VisionAI Smart Glasses: Autonomia e Liberdade em Cada Passo</h1>
+          <p>Óculos inteligentes de última geração desenvolvidos com Inteligência Artificial e áudio 3D para transformar a percepção e locomoção de pessoas com deficiência visual.</p>
+          <a href="#contato" class="btn-cta">Garantir Preço Especial de Pré-Venda</a>
+        </div>
+        <div class="hero-image-container">
+          <!-- Imagem estilizada por placeholder acessível em CSS com texto alternativo ultra detalhado -->
+          <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" 
+               alt="[Imagem de Óculos inteligentes VisionAI com armação preta fosca, câmeras discretas na frente e acabamento ergonômico moderno]" 
+               class="hero-image"
+               width="500" 
+               height="350">
+        </div>
+      </div>
+    </section>
+
+    <!-- PILARES DO PRODUTO (RECURSOS) -->
+    <section id="recursos" class="features-section" aria-labelledby="features-title">
+      <h2 id="features-title" class="section-title">Pilares da Tecnológicas VisionAI</h2>
+      <p class="section-subtitle">Conheça as quatro tecnologias fundamentais que compõem nossos óculos inteligentes</p>
+
+      <div class="features-grid">
+        
+        <!-- Pilar 1 -->
+        <article class="feature-card" aria-labelledby="pilar1-title">
+          <h3 id="pilar1-title" class="feature-title">1. Hardware e Ergonomia</h3>
+          <p>Projetado para uso diário contínuo e confortável, combinando materiais nobres e resistentes.</p>
+          <ul>
+            <li><strong>Armação Ultra Leve:</strong> Menos de 50 gramas com resistência IP67 à água e poeira.</li>
+            <li><strong>Áudio de Condução Aberta:</strong> Alto-falantes direcionais nas hastes que transmitem o som sem cobrir os ouvidos, mantendo a audição do ambiente preservada.</li>
+            <li><strong>Câmeras HD Ultra-Wide:</strong> Captura de imagem em alta definição com visão grande-angular para detecção precisa.</li>
+          </ul>
+        </article>
+
+        <!-- Pilar 2 -->
+        <article class="feature-card" aria-labelledby="pilar2-title">
+          <h3 id="pilar2-title" class="feature-title">2. Detecção de Obstáculos e Alertas</h3>
+          <p>Sistema avançado de visão computacional trabalhando continuamente em tempo real.</p>
+          <ul>
+            <li><strong>Mapeamento do Terreno:</strong> Identificação imediata de degraus, buracos, calçadas irregulares e desníveis.</li>
+            <li><strong>Proteção Dinâmica:</strong> Reconhecimento de veículos, pedestres e objetos em movimento na trajetória.</li>
+            <li><strong>Alertas Sonoros Tridimensionais (Áudio 3D):</strong> Emite avisos sonoros direcionais que indicam com exatidão a distância e a posição geográfica do perigo.</li>
+          </ul>
+        </article>
+
+        <!-- Pilar 3 -->
+        <article class="feature-card" aria-labelledby="pilar3-title">
+          <h3 id="pilar3-title" class="feature-title">3. IA Descritiva Assistente</h3>
+          <p>Sua assistente pessoal inteligente pronta para traduzir o mundo visual em áudio em tempo real.</p>
+          <ul>
+            <li><strong>Leitura Instantânea:</strong> Leitura fluida de livros, rótulos de produtos, cardápios e documentos impressos ou digitais.</li>
+            <li><strong>Reconhecimento do Dia a Dia:</strong> Identificação de cores de roupas, cédulas de dinheiro e cédulas bancárias.</li>
+            <li><strong>Ativação Total por Voz:</strong> Faça perguntas naturais como "Qual é este produto?" ou "Qual a cor desta camisa?" e receba respostas em áudio natural.</li>
+          </ul>
+        </article>
+
+        <!-- Pilar 4 -->
+        <article class="feature-card" aria-labelledby="pilar4-title">
+          <h3 id="pilar4-title" class="feature-title">4. Navegação por GPS Guiado por Voz</h3>
+          <p>Navegação ponto a ponto pensada exclusivamente para a orientação de pedestres com deficiência visual.</p>
+          <ul>
+            <li><strong>Orientação no Nível da Calçada:</strong> Instruções detalhadas (ex: "vire à direita após a farmácia", "faixa de pedestres em 5 metros").</li>
+            <li><strong>Interface Conversacional:</strong> Diga apenas o destino desejado e a IA traçará a rota mais segura.</li>
+            <li><strong>Pontos de Interesse:</strong> Notificações sobre estabelecimentos, paradas de ônibus e obstáculos no caminho.</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE APOIO E COMUNIDADE -->
+    <section id="comunidade" class="community-section" aria-labelledby="community-title">
+      <div class="community-container">
+        <h2 id="community-title" class="section-title">Apoio, Recursos e Comunidade</h2>
+        <p class="section-subtitle">Portal de orientação, direitos e ferramentas úteis para a pessoa com deficiência visual</p>
+
+        <div class="community-grid">
+          <div class="info-card">
+            <h3>Direitos e Legislação</h3>
+            <p>Guia completo sobre a Lei Brasileira de Inclusão (LBI), passes livres de transporte e isenções para aquisição de tecnologias assistivas.</p>
+            <p><a href="#contato">Solicitar Guia em PDF/Áudio</a></p>
+          </div>
+
+          <div class="info-card">
+            <h3>Rede de Treinamento</h3>
+            <p>Conecte-se com instrutores especializados em Orientação e Mobilidade (O&amp;M) para aprender a utilizar o VisionAI juntamente com a bengala tradicional.</p>
+            <p><a href="#contato">Encontrar Instrutor Próximo</a></p>
+          </div>
+
+          <div class="info-card">
+            <h3>Aplicativos Parceiros</h3>
+            <p>Listagem atualizada dos melhores leitores de tela e utilitários para smartphones totalmente compatíveis com o ecossistema VisionAI.</p>
+            <p><a href="#contato">Ver Lista de Aplicativos</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE DEPOIMENTOS -->
+    <section id="depoimentos" class="testimonials-section" aria-labelledby="testimonials-title">
+      <h2 id="testimonials-title" class="section-title">Histórias de Autonomia</h2>
+      <p class="section-subtitle">Veja como o VisionAI está transformando a rotina de nossos usuários de testes</p>
+
+      <div class="testimonials-grid">
+        <article class="testimonial-card">
+          <p class="testimonial-quote">"O áudio 3D para identificar degraus e o aviso de galhos na altura da cabeça mudaram completamente minha confiança ao caminhar no centro da cidade. Não saio mais de casa sem eles."</p>
+          <p class="testimonial-author">— Mariana Silva, Professora e Usuária de Testes</p>
+        </article>
+
+        <article class="testimonial-card">
+          <p class="testimonial-quote">"Poder ler o cardápio em um restaurante ou conferir o rótulo de uma lata no supermercado sem precisar pedir ajuda para estranhos é uma sensação de independência indescritível."</p>
+          <p class="testimonial-author">— Carlos Eduardo, Analista de Sistemas</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- FORMULÁRIO DE CONTATO E PRÉ-VENDA -->
+    <section id="contato" class="contact-section" aria-labelledby="contact-title">
+      <div class="contact-container">
+        <h2 id="contact-title" class="section-title">Pré-venda e Atendimento</h2>
+        <p class="section-subtitle">Preencha o formulário abaixo para garantir condições especiais no lançamento do VisionAI</p>
+
+        <form id="preorder-form" aria-describedby="form-instructions" novalidate>
+          <p id="form-instructions" class="form-hint" style="margin-bottom: 1rem;">Todos os campos marcados com asterisco (*) são de preenchimento obrigatório.</p>
+
+          <div class="form-group">
+            <label for="name">Nome Completo *</label>
+            <input type="text" id="name" name="name" required aria-required="true" autocomplete="name" placeholder="Ex: Maria Oliveira">
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail para Contato *</label>
+            <input type="email" id="email" name="email" required aria-required="true" autocomplete="email" placeholder="Ex: maria@exemplo.com">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Telefone / WhatsApp *</label>
+            <input type="tel" id="phone" name="phone" required aria-required="true" autocomplete="tel" placeholder="Ex: (11) 99999-9999">
+          </div>
+
+          <div class="form-group">
+            <label for="profile">Perfil do Interessado *</label>
+            <select id="profile" name="profile" required aria-required="true">
+              <option value="">Selecione uma opção</option>
+              <option value="usuario">Pessoa com Deficiência Visual</option>
+              <option value="familiar">Familiar ou Cuidador</option>
+              <option value="profissional">Profissional da Saúde / Reabilitação</option>
+              <option value="outro">Outros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Mensagem ou Dúvidas (Opcional)</label>
+            <textarea id="message" name="message" rows="4" placeholder="Escreva aqui suas dúvidas ou necessidades específicas..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">Enviar Cadastro de Pré-Venda</button>
+
+          <!-- Mensagem de resposta em tempo real lida pelo leitor de tela (aria-live) -->
+          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       RODAPÉ
+       ========================================================================== -->
+  <footer class="main-footer" role="contentinfo">
+    <div class="footer-container">
+      <p><strong>VisionAI Technology &copy; 2026</strong> — Todos os direitos reservados.</p>
+      <p>Desenvolvido focado em acessibilidade universal e autonomia pessoal.</p>
+      <div>
+        <span class="wcag-badge" aria-label="Declaração de Conformidade: Este site segue as diretrizes do WCAG 2.1 Nível AA">
+          Conformidade WCAG 2.1 AA
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       JAVASCRIPT FUNCIONAL DE ACESSIBILIDADE E FORMULÁRIO
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // --- Alternador de Alto Contraste ---
+      const contrastBtn = document.getElementById('btn-contrast');
+      contrastBtn.addEventListener('click', function() {
+        const isHighContrast = document.body.classList.toggle('high-contrast');
+        contrastBtn.setAttribute('aria-pressed', isHighContrast);
+        
+        // Mensagem audível para leitores de tela
+        announceToScreenReader(isHighContrast ? 'Modo de alto contraste ativado.' : 'Modo de alto contraste desativado.');
+      });
+
+      // --- Ajuste de Tamanho de Fonte ---
+      const fontIncreaseBtn = document.getElementById('btn-font-increase');
+      const fontResetBtn = document.getElementById('btn-font-reset');
+
+      fontIncreaseBtn.addEventListener('click', function() {
+        if (!document.body.classList.contains('font-large') && !document.body.classList.contains('font-xlarge')) {
+          document.body.classList.add('font-large');
+          announceToScreenReader('Tamanho da fonte aumentado.');
+        } else if (document.body.classList.contains('font-large')) {
+          document.body.classList.remove('font-large');
+          document.body.classList.add('font-xlarge');
+          announceToScreenReader('Tamanho da fonte aumentado para o nível máximo.');
+        }
+      });
+
+      fontResetBtn.addEventListener('click', function() {
+        document.body.classList.remove('font-large', 'font-xlarge');
+        announceToScreenReader('Tamanho da fonte restaurado para o padrão.');
+      });
+
+      // --- Validação e Envio do Formulário ---
+      const form = document.getElementById('preorder-form');
+      const statusDiv = document.getElementById('form-status');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validação simples
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const profile = document.getElementById('profile').value;
+
+        if (!name || !email || !phone || !profile) {
+          statusDiv.className = 'form-status';
+          statusDiv.style.display = 'block';
+          statusDiv.style.backgroundColor = '#b71c1c';
+          statusDiv.style.color = '#ffffff';
+          statusDiv.innerHTML = '<strong>Atenção:</strong> Por favor, preencha todos os campos obrigatórios (*).';
+          announceToScreenReader('Erro no formulário: Por favor, preencha todos os campos obrigatórios.');
+          return;
+        }
+
+        // Sucesso na simulação de envio
+        statusDiv.className = 'form-status success';
+        statusDiv.innerHTML = `<strong>Obrigado, ${name}!</strong> Cadastro de pré-venda realizado com sucesso. Entraremos em contato em breve através do e-mail fornecido.`;
+        
+        form.reset();
+      });
+
+      // Função utilitária para anunciar alterações ao leitor de tela
+      function announceToScreenReader(message) {
+        let ariaAnnouncer = document.getElementById('aria-announcer');
+        if (!ariaAnnouncer) {
+          ariaAnnouncer = document.createElement('div');
+          ariaAnnouncer.id = 'aria-announcer';
+          ariaAnnouncer.setAttribute('aria-live', 'assertive');
+          ariaAnnouncer.setAttribute('aria-atomic', 'true');
+          ariaAnnouncer.style.position = 'absolute';
+          ariaAnnouncer.style.width = '1px';
+          ariaAnnouncer.style.height = '1px';
+          ariaAnnouncer.style.overflow = 'hidden';
+          ariaAnnouncer.style.clip = 'rect(1px, 1px, 1px, 1px)';
+          document.body.appendChild(ariaAnnouncer);
+        }
+        ariaAnnouncer.textContent = message;
+      }
+    });
+  </script>
+</body>
+</html>
